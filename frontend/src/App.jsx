@@ -12,8 +12,8 @@ import PinataUploader from "./components/PinataUploader";
 import FolderUploader from "./components/FolderUploader";
 import GetSepoliaBalance from "./components/GetSepoliaBalance";
 
-import.meta.env.VITE_GATEWAY_URL
-import.meta.env.VITE_SERVER_URL
+import.meta.env.VITE_GATEWAY_URL;
+import.meta.env.VITE_SERVER_URL;
 function App() {
   const [walletAddress, setWalletAddress] = useState(null);
   const [contract, setContract] = useState(null);
@@ -31,25 +31,29 @@ function App() {
       alert("Please install MetaMask to use this app.");
       return;
     }
-  
+
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+      const contractInstance = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        CONTRACT_ABI,
+        signer
+      );
       setContract(contractInstance);
-  
+
       const doctor = await contractInstance.doctor();
       const patient = await contractInstance.patient();
       const hospital = await contractInstance.hospital();
       const caller = await signer.getAddress();
-  
+
       const addr = walletAddress.toLowerCase();
-  
+
       console.log("🔍 Connected wallet address:", addr);
       console.log("🏥 Contract's hospital:", hospital.toLowerCase());
       console.log("🧑‍⚕️ Contract's doctor:", doctor.toLowerCase());
       console.log("👤 Contract's patient:", patient.toLowerCase());
-  
+
       if (addr === doctor.toLowerCase()) {
         setRole("Doctor");
         console.log("✅ Role detected: Doctor");
@@ -67,49 +71,45 @@ function App() {
       console.error("Contract init error:", error);
     }
   }
-  
-  
 
   return (
-    <div>
-      <h1>🩺 Welcome to MediMint</h1>
-      <MetamaskButton onWalletConnected={setWalletAddress} />
-  
+    <div className="relative flex flex-col justify-center items-center gap-5 min-h-screen w-screen">
+      {/* Top-right balance component */}
+      <div className="absolute top-4 right-4">
+        <GetSepoliaBalance />
+      </div>
+
+      <div className="flex flex-col gap-5 p-2">
+        <h1 className="text-6xl bg-gradient-to-r from-white to-red-500 bg-clip-text text-transparent">
+          🩺 Welcome to MediMint
+        </h1>
+        <MetamaskButton onWalletConnected={setWalletAddress} />
+      </div>
+
       {walletAddress && (
-        <div>
-          <p>🟢 Connected Wallet: {walletAddress}</p>
-          <p>🧑‍⚕️ Role: <strong>{role || "Detecting..."}</strong></p>
-          
+        <div className="flex flex-col gap-5 p-2 w-full items-center justify-center">
+          <div className="flex flex-col justify-start items-start text-start text-xl gap-5">
+            <p>🟢 Connected Wallet: {walletAddress}</p>
+            <p>
+              🧑‍⚕️ Role: <strong>{role || "Detecting..."}</strong>
+            </p>
+          </div>
+
           {role === "Doctor" && (
-            <>
+            <div className="flex flex-col gap-2 w-full">
               <DoctorActions contract={contract} />
-              
-              <PinataUploader />
-              <FolderUploader />
-              <GetSepoliaBalance />
-              {/* <BundlePreview contract={contract} tokenId={1} />  */}
-              {/* test with tokenId 1 */}
-            </>
+            </div>
           )}
           {role === "Patient" && (
-            <>
+            <div className="flex flex-col gap-2">
               <PatientActions contract={contract} />
-      
-              <GetSepoliaBalance />
-              {/* <BundlePreview contract={contract} tokenId={1} />  */}
-              {/* test with tokenId 1 */}
-            </>
+            </div>
           )}
           {role === "Hospital" && (
-            <>
+            <div className="flex flex-col gap-2">
               <HospitalActions contract={contract} />
-        
-              <GetSepoliaBalance />
-              {/* <BundlePreview contract={contract} tokenId={1} />  */}
-              {/* test with tokenId 1 */}
-            </>
+            </div>
           )}
-          {/* {(role === "Patient" || role === "Hospital") && <SignerActions contract={contract} />} */}
           {role === "Unknown" && <Unauthorized />}
         </div>
       )}

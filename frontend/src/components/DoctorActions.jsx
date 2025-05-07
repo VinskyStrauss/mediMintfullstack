@@ -1,16 +1,22 @@
 import { useState, useEffect } from "react";
 import MetadataUpdater from "./MetadataUpdater";
+import PinataUploader from "./PinataUploader";
+import FolderUploader from "./FolderUploader";
 
 function DoctorActions({ contract, walletAddress }) {
-  const [cid, setCid] = useState(localStorage.getItem('lastCID') || "");
-  const [hashID, setHashID] = useState(localStorage.getItem('lastHashID') || "");
+  const [cid, setCid] = useState(localStorage.getItem("lastCID") || "");
+  const [hashID, setHashID] = useState(
+    localStorage.getItem("lastHashID") || ""
+  );
   const [sigCount, setSigCount] = useState(0);
   const [required, setRequired] = useState(3);
   const [copied, setCopied] = useState(false);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const [externalHashCID, setExternalHashCID] = useState(localStorage.getItem('externalCID') || "");
+  const [externalHashCID, setExternalHashCID] = useState(
+    localStorage.getItem("externalCID") || ""
+  );
   const [externalStatus, setExternalStatus] = useState("");
 
   useEffect(() => {
@@ -23,8 +29,8 @@ function DoctorActions({ contract, walletAddress }) {
           setSigCount(count.toNumber());
 
           // Save updated CID and hashID to localStorage
-          localStorage.setItem('lastCID', cid);
-          localStorage.setItem('lastHashID', hash);
+          localStorage.setItem("lastCID", cid);
+          localStorage.setItem("lastHashID", hash);
         } catch (err) {
           console.error("Failed to fetch hash/signatures:", err);
           setHashID("");
@@ -59,8 +65,8 @@ function DoctorActions({ contract, walletAddress }) {
       setSigCount(count.toNumber());
 
       // Save again after request
-      localStorage.setItem('lastCID', cid);
-      localStorage.setItem('lastHashID', hash);
+      localStorage.setItem("lastCID", cid);
+      localStorage.setItem("lastHashID", hash);
     } catch (err) {
       console.error("Signature request failed:", err);
       setStatus("❌ Request failed");
@@ -79,19 +85,22 @@ function DoctorActions({ contract, walletAddress }) {
       setLoading(true);
       const tx = await contract.mintBundle(cid, hashID);
       const receipt = await tx.wait();
-      
+
       let mintedTokenId = null;
       if (receipt && receipt.events) {
         for (const event of receipt.events) {
-          if (event.event === "ImageBundleUploaded") {   // <--- Change to your correct event name
+          if (event.event === "ImageBundleUploaded") {
+            // <--- Change to your correct event name
             mintedTokenId = event.args.tokenId.toString();
             break;
           }
         }
       }
-    
+
       if (!mintedTokenId) {
-        console.warn("⚠️ TokenId not found in events. Check your contract event.");
+        console.warn(
+          "⚠️ TokenId not found in events. Check your contract event."
+        );
         mintedTokenId = "Unknown";
       }
       // ✅ After mint, show info
@@ -102,10 +111,9 @@ function DoctorActions({ contract, walletAddress }) {
         \n🖼️ [View Image on IPFS](https://gateway.pinata.cloud/ipfs/${cid})
       `);
 
-
       // ✅ After mint, clear localStorage
-      localStorage.removeItem('lastCID');
-      localStorage.removeItem('lastHashID');
+      localStorage.removeItem("lastCID");
+      localStorage.removeItem("lastHashID");
       setCid("");
       setHashID("");
       setSigCount(0);
@@ -125,8 +133,8 @@ function DoctorActions({ contract, walletAddress }) {
   };
 
   const handleClearCID = () => {
-    localStorage.removeItem('lastCID');
-    localStorage.removeItem('lastHashID');
+    localStorage.removeItem("lastCID");
+    localStorage.removeItem("lastHashID");
     setCid("");
     setHashID("");
     setSigCount(0);
@@ -150,85 +158,114 @@ function DoctorActions({ contract, walletAddress }) {
   };
 
   return (
-    <div>
-      <h3>Doctor Actions</h3>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 max-w-7xl mx-auto">
+      {/* Left Side: 2 Columns */}
+      <div className="lg:col-span-2 space-y-6">
+        <h3 className="text-3xl font-semibold">Doctor Actions</h3>
 
-      <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
-        <input
-          type="text"
-          value={cid}
-          onChange={(e) => setCid(e.target.value)}
-          placeholder="Enter IPFS CID"
-          style={{ flex: 1, marginRight: "10px" }}
-        />
-      </div>
-      <button
-        onClick={handleClearCID}
-        disabled={loading}
-        style={{ marginLeft: "10px", backgroundColor: "#f8d7da", color: "#721c24", padding: "4px 8px", border: "1px solid #f5c6cb", borderRadius: "4px" }}
-      >
-        🧹 Clear CID
-      </button>
-
-      {hashID && (
-        <div style={{ marginBottom: "10px" }}>
-          <strong>HashID:</strong> <span style={{ wordBreak: "break-all" }}>{hashID}</span>
-          <button 
-            onClick={handleCopyHashID} 
-            style={{ marginLeft: "10px", padding: "4px 8px" }}
+        {/* CID Input and Clear Button */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+          <input
+            type="text"
+            value={cid}
+            onChange={(e) => setCid(e.target.value)}
+            placeholder="Enter IPFS CID"
+            className="col-span-2 px-4 py-2 border rounded-md"
+          />
+          <button
+            onClick={handleClearCID}
+            disabled={loading}
+            className="bg-red-100 text-red-800 px-4 py-2 rounded-md border border-red-300"
           >
-            {copied ? "✅ Copied" : "📋 Copy"}
+            🧹 Clear CID
           </button>
         </div>
-      )}
 
-      <p>
-        ✍️ Signature Progress: <strong>{sigCount}</strong> / {required}
-      </p>
+        {/* Hash ID Display */}
+        {hashID && (
+          <div className="flex items-center gap-4 flex-wrap">
+            <span className="font-medium">HashID:</span>
+            <span className="break-all text-sm">{hashID}</span>
+            <button
+              onClick={handleCopyHashID}
+              className="bg-gray-100 border px-3 py-1 rounded-md"
+            >
+              {copied ? "✅ Copied" : "📋 Copy"}
+            </button>
+          </div>
+        )}
 
-      {status && (
-        <p>
-          {loading && <span style={{ marginRight: "5px" }}>🔄</span>}
-          {status}
-        </p>
-      )}
+        {/* Signature Progress and Status */}
+        <div className="text-sm">
+          <p>
+            ✍️ Signature Progress: <strong>{sigCount}</strong> / {required}
+          </p>
+          {status && (
+            <p className="flex items-center gap-2">
+              {loading && <span>🔄</span>}
+              {status}
+            </p>
+          )}
+        </div>
 
-      <button
-        onClick={() => handleRequestSignature(cid)}
-        disabled={!cid || loading}
-      >
-        🖋️ Request Signature
-      </button>
+        {/* Request Signature & Mint NFT Buttons */}
+        <div className="flex flex-wrap gap-4">
+          <button
+            onClick={() => handleRequestSignature(cid)}
+            disabled={!cid || loading}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md disabled:opacity-50"
+          >
+            🖋️ Request Signature
+          </button>
+          <button
+            onClick={() => handleMintNFT(cid)}
+            disabled={!cid || sigCount < required || loading}
+            className="bg-green-500 text-white px-4 py-2 rounded-md disabled:opacity-50"
+          >
+            🪙 Mint NFT
+          </button>
+        </div>
 
-      <button
-        onClick={() => handleMintNFT(cid)}
-        disabled={!cid || sigCount < required || loading}
-        style={{ marginLeft: "10px" }}
-      >
-        🪙 Mint NFT
-      </button>
-      <hr />
+        <hr />
 
-      <h4>🔄 Update Metadata</h4>
-      <MetadataUpdater contract={contract} />
-      <hr />
-      <h4>🖋️ Sign Request</h4>
-      <input
-        type="text"
-        value={externalHashCID}
-        onChange={(e) => {
-          setExternalHashCID(e.target.value);
-          localStorage.setItem('externalCID', e.target.value);
-        }}
-        placeholder="Enter HashID"
-        style={{ marginRight: "10px", display: "block", width: "100%", marginBottom: "10px" }}
-      />
-      <button onClick={handleSignRequest}>
-        ✍️ Sign request
-      </button>
-      {externalStatus && <p>{externalStatus}</p>}
+        {/* Metadata Updater */}
+        <div>
+          <h4 className="text-lg font-semibold mb-2">🔄 Update Metadata</h4>
+          <MetadataUpdater contract={contract} />
+        </div>
+
+        <hr />
+
+        {/* External Hash Sign Request */}
+        <div>
+          <h4 className="text-lg font-semibold mb-2">🖋️ Sign Request</h4>
+          <input
+            type="text"
+            value={externalHashCID}
+            onChange={(e) => {
+              setExternalHashCID(e.target.value);
+              localStorage.setItem("externalCID", e.target.value);
+            }}
+            placeholder="Enter HashID"
+            className="w-full px-4 py-2 mb-3 border rounded-md"
+          />
+          <button
+            onClick={handleSignRequest}
+            className="bg-indigo-500 text-white px-4 py-2 rounded-md"
+          >
+            ✍️ Sign request
+          </button>
+          {externalStatus && <p className="mt-2 text-sm">{externalStatus}</p>}
+        </div>
+      </div>
+
+      {/* Right Sidebar: Uploaders */}
+      <div className="space-y-6">
+        <h4 className="text-lg font-semibold">📤 Upload Tools</h4>
+        <PinataUploader />
+        <FolderUploader />
+      </div>
     </div>
-    
   );
 }
 

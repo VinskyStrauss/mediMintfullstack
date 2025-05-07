@@ -26,19 +26,28 @@ function GetSepoliaBalance() {
   };
 
   return (
-    <div className="p-4 bg-white shadow-md rounded-xl w-full max-w-md mx-auto text-center">
-      <h3 className="text-lg font-bold mb-4">Check Sepolia ETH Balance</h3>
+    <div className="p-6 bg-white shadow-lg rounded-2xl w-full max-w-md mx-auto text-center space-y-4">
+      <h3 className="text-xl font-semibold text-gray-800">
+        🔍 Check Sepolia ETH Balance
+      </h3>
+
       <button
         onClick={getMyEthBalance}
-        className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-xl transition duration-300"
+        className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-xl transition duration-300 focus:outline-none focus:ring-2 focus:ring-green-400"
       >
-        Get ETH Balance
+        💰 Get ETH Balance
       </button>
 
       {balanceInfo.address && (
-        <div className="mt-4 text-left">
-          <p><strong>Address:</strong> {balanceInfo.address}</p>
-          <p><strong>ETH:</strong> {balanceInfo.eth} Sepolia ETH</p>
+        <div className="pt-4 border-t text-left space-y-1 text-gray-700">
+          <p>
+            <span className="font-semibold">Address:</span>{" "}
+            {balanceInfo.address}
+          </p>
+          <p>
+            <span className="font-semibold">ETH:</span> {balanceInfo.eth}{" "}
+            Sepolia ETH
+          </p>
         </div>
       )}
     </div>

@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { PinataSDK } from 'pinata'
+import { PinataSDK } from "pinata";
 
 const pinata = new PinataSDK({
   pinataJwt: "",
-  pinataGateway: import.meta.env.VITE_GATEWAY_URL
-})
+  pinataGateway: import.meta.env.VITE_GATEWAY_URL,
+});
 function PinataUploader() {
   const [file, setFile] = useState(null);
   const [uploadStatus, setUploadStatus] = useState("");
@@ -21,31 +21,35 @@ function PinataUploader() {
 
     try {
       setUploadStatus("Getting upload URL...");
-      const urlResponse = await fetch(`${import.meta.env.VITE_SERVER_URL}/presigned_url`, {
-        method: "GET",
-        headers: {
-          // Add auth headers if needed
-        },
-      });
+      const urlResponse = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/presigned_url`,
+        {
+          method: "GET",
+          headers: {
+            // Add auth headers if needed
+          },
+        }
+      );
 
       const data = await urlResponse.json();
       setUploadStatus("Uploading file...");
 
-      const upload = await pinata.upload.public.file(file).url(data.url)
-      
-      if(upload.cid){
-        setUploadStatus('File uploaded successfully!')
-        const ipfsLink = await pinata.gateways.public.convert(upload.cid)
-        setLink(ipfsLink)
-      }else{
-        setUploadStatus('Upload failed!')
+      const upload = await pinata.upload.public.file(file).url(data.url);
+
+      if (upload.cid) {
+        setUploadStatus("File uploaded successfully!");
+        const ipfsLink = await pinata.gateways.public.convert(upload.cid);
+        setLink(ipfsLink);
+      } else {
+        setUploadStatus("Upload failed!");
       }
-    }catch (error){
-      setUploadStatus(`Error: ${error instanceof Error ? error.message : String(error)}`)
+    } catch (error) {
+      setUploadStatus(
+        `Error: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
 
-
-      /* const formData = new FormData();
+    /* const formData = new FormData();
       formData.append("file", file);
 
       const uploadRes = await fetch(data.url, {
@@ -70,17 +74,38 @@ function PinataUploader() {
   };
 
   return (
-    <div style={{ padding: "1rem", border: "1px solid #ccc", borderRadius: 8, marginTop: 20 }}>
-      <h3>📤 Upload File to IPFS</h3>
-      <input type="file" onChange={handleFileChange} />
-      <br />
-      <button style={{ marginTop: 10 }} onClick={handleUpload} disabled={!file}>
+    <div className="p-4 border border-gray-300 rounded-lg mt-5 space-y-4">
+      <h3 className="text-lg font-semibold">📤 Upload File to IPFS</h3>
+
+      <input
+        type="file"
+        onChange={handleFileChange}
+        className="block w-full text-sm text-white file:mr-4 file:py-2 file:px-4
+               file:rounded-md file:border-0 file:text-sm file:font-semibold
+               file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+      />
+
+      <button
+        onClick={handleUpload}
+        disabled={!file}
+        className="bg-blue-500 text-white px-4 py-2 rounded-md disabled:opacity-50"
+      >
         Upload to Pinata
       </button>
-      {uploadStatus && <p>{uploadStatus}</p>}
+
+      {uploadStatus && <p className="text-sm text-gray-600">{uploadStatus}</p>}
+
       {link && (
-        <p>
-          🔗 <a href={link} target="_blank" rel="noopener noreferrer">View File on IPFS</a>
+        <p className="text-sm text-blue-600">
+          🔗{" "}
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            View File on IPFS
+          </a>
         </p>
       )}
     </div>

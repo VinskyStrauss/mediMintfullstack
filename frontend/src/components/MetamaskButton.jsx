@@ -22,7 +22,9 @@ function MetamaskButton({ onWalletConnected }) {
 
   async function checkIfWalletIsConnected() {
     if (window.ethereum) {
-      const accounts = await window.ethereum.request({ method: "eth_accounts" });
+      const accounts = await window.ethereum.request({
+        method: "eth_accounts",
+      });
       if (accounts.length > 0) {
         setWalletAddress(accounts[0]);
         onWalletConnected(accounts[0]);
@@ -36,7 +38,9 @@ function MetamaskButton({ onWalletConnected }) {
       return;
     }
     try {
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
       setWalletAddress(accounts[0]);
       onWalletConnected(accounts[0]);
     } catch (err) {
@@ -47,11 +51,14 @@ function MetamaskButton({ onWalletConnected }) {
   return (
     <div>
       {walletAddress ? (
-        <>
-          <button onClick={connectWallet}>🔁 Switch Account</button>
-        </>
+        <></>
       ) : (
-        <button onClick={connectWallet}>🦊 Connect MetaMask</button>
+        <button
+          onClick={connectWallet}
+          className="px-6 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition duration-300 shadow-md flex items-center gap-2"
+        >
+          🦊 Connect MetaMask
+        </button>
       )}
     </div>
   );

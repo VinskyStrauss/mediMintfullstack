@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import ViewModal from "./ViewModal";
 function HospitalActions({ contract }) {
   const [hashID, setHashID] = useState("");
   const [status, setStatus] = useState("");
@@ -7,14 +7,26 @@ function HospitalActions({ contract }) {
   const [required, setRequired] = useState(3);
   const [copied, setCopied] = useState(false);
 
-  const [newDoctor, setNewDoctor] = useState(localStorage.getItem('newDoctorAddress') || "");
-  const [changeDoctorHashID, setChangeDoctorHashID] = useState(localStorage.getItem('doctorChangeHashID') || "");
+  const [newDoctor, setNewDoctor] = useState(
+    localStorage.getItem("newDoctorAddress") || ""
+  );
+  const [changeDoctorHashID, setChangeDoctorHashID] = useState(
+    localStorage.getItem("doctorChangeHashID") || ""
+  );
 
-  const [newHospital, setNewHospital] = useState(localStorage.getItem('newHospitalAddress') || "");
-  const [changeHospitalHashID, setChangeHospitalHashID] = useState(localStorage.getItem('hospitalChangeHashID') || "");
+  const [newHospital, setNewHospital] = useState(
+    localStorage.getItem("newHospitalAddress") || ""
+  );
+  const [changeHospitalHashID, setChangeHospitalHashID] = useState(
+    localStorage.getItem("hospitalChangeHashID") || ""
+  );
 
   const [hospitalSigCount, setHospitalSigCount] = useState(0);
-  const [accountInfo, setAccountInfo] = useState({ doctor: '', patient: '', hospital: '' });
+  const [accountInfo, setAccountInfo] = useState({
+    doctor: "",
+    patient: "",
+    hospital: "",
+  });
 
   useEffect(() => {
     const fetchSignatureProgress = async () => {
@@ -45,20 +57,6 @@ function HospitalActions({ contract }) {
     };
     fetchHospitalSigProgress();
   }, [changeHospitalHashID, contract]);
-
-  const handleFetchRoles = async () => {
-    if (!contract) return;
-    try {
-      const doctor = await contract.doctor();
-      const patient = await contract.patient();
-      const hospital = await contract.hospital();
-      setAccountInfo({ doctor, patient, hospital });
-      setStatus("✅ Fetched role addresses from contract");
-    } catch (err) {
-      console.error("Failed to fetch roles:", err);
-      setStatus("❌ Failed to fetch role addresses");
-    }
-  };
 
   const handleSignRequest = async () => {
     if (!hashID) {
@@ -102,8 +100,8 @@ function HospitalActions({ contract }) {
       }
 
       setChangeDoctorHashID(hash);
-      localStorage.setItem('doctorChangeHashID', hash);
-      localStorage.setItem('newDoctorAddress', newDoctor);
+      localStorage.setItem("doctorChangeHashID", hash);
+      localStorage.setItem("newDoctorAddress", newDoctor);
       setStatus("📨 Change doctor request submitted!");
     } catch (err) {
       console.error("Request failed:", err);
@@ -118,7 +116,10 @@ function HospitalActions({ contract }) {
     }
     try {
       setStatus("⚙️ Applying doctor change...");
-      const tx = await contract.applyDoctorChange(changeDoctorHashID, newDoctor);
+      const tx = await contract.applyDoctorChange(
+        changeDoctorHashID,
+        newDoctor
+      );
       await tx.wait();
       setStatus("✅ Doctor change applied successfully!");
     } catch (err) {
@@ -135,7 +136,10 @@ function HospitalActions({ contract }) {
 
     try {
       setStatus("⏳ Requesting hospital change...");
-      const tx = await contract.requestRoleChange("changeHospital", newHospital);
+      const tx = await contract.requestRoleChange(
+        "changeHospital",
+        newHospital
+      );
       const receipt = await tx.wait();
 
       let hash = null;
@@ -152,8 +156,8 @@ function HospitalActions({ contract }) {
       }
 
       setChangeHospitalHashID(hash);
-      localStorage.setItem('hospitalChangeHashID', hash);
-      localStorage.setItem('newHospitalAddress', newHospital);
+      localStorage.setItem("hospitalChangeHashID", hash);
+      localStorage.setItem("newHospitalAddress", newHospital);
       setStatus("📨 Change hospital request submitted!");
     } catch (err) {
       console.error("Request failed:", err);
@@ -168,7 +172,10 @@ function HospitalActions({ contract }) {
     }
     try {
       setStatus("⚙️ Applying hospital change...");
-      const tx = await contract.applyHospitalChange(changeHospitalHashID, newHospital);
+      const tx = await contract.applyHospitalChange(
+        changeHospitalHashID,
+        newHospital
+      );
       await tx.wait();
       setStatus("✅ Hospital change applied successfully!");
     } catch (err) {
@@ -197,8 +204,8 @@ function HospitalActions({ contract }) {
     setNewDoctor("");
     setChangeDoctorHashID("");
     setSigCount(0);
-    localStorage.removeItem('doctorChangeHashID');
-    localStorage.removeItem('newDoctorAddress');
+    localStorage.removeItem("doctorChangeHashID");
+    localStorage.removeItem("newDoctorAddress");
     setStatus("🧹 Cleared doctor change request");
   };
 
@@ -206,112 +213,204 @@ function HospitalActions({ contract }) {
     setNewHospital("");
     setChangeHospitalHashID("");
     setHospitalSigCount(0);
-    localStorage.removeItem('hospitalChangeHashID');
-    localStorage.removeItem('newHospitalAddress');
+    localStorage.removeItem("hospitalChangeHashID");
+    localStorage.removeItem("newHospitalAddress");
     setStatus("🧹 Cleared hospital change request");
   };
 
+  // State to manage modal visibility
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Function to open the modal
+  const handleOpenModal = () => setIsModalOpen(true);
+
+  // Function to close the modal
+  const handleCloseModal = () => setIsModalOpen(false);
+
+  const handleFetchRoles = async () => {
+    if (!contract) return;
+    try {
+      const doctor = await contract.doctor();
+      const patient = await contract.patient();
+      const hospital = await contract.hospital();
+      setAccountInfo({ doctor, patient, hospital });
+      handleOpenModal();
+      setStatus("✅ Fetched role addresses from contract");
+    } catch (err) {
+      console.error("Failed to fetch roles:", err);
+      setStatus("❌ Failed to fetch role addresses");
+    }
+  };
+
   return (
-    <div>
-      <h3>Hospital Actions</h3>
+    <div className="flex flex-col gap-6 p-6 max-w-2xl mx-auto w-full">
+      <h3 className="text-3xl font-bold ">Hospital Actions</h3>
 
-      <button onClick={handleFetchRoles}>📋 View Current Role Addresses</button>
+      <button
+        onClick={handleFetchRoles}
+        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+      >
+        📋 View Current Role Addresses
+      </button>
+
       {accountInfo.doctor && (
-        <div style={{ marginTop: "10px" }}>
-          <p><strong>🧑‍⚕️ Doctor:</strong> {accountInfo.doctor}</p>
-          <p><strong>🏥 Hospital:</strong> {accountInfo.hospital}</p>
-          <p><strong>👤 Patient:</strong> {accountInfo.patient}</p>
-        </div>
+        <ViewModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          doctor={accountInfo.doctor}
+          hospital={accountInfo.hospital}
+          patient={accountInfo.patient}
+        />
       )}
 
-      <input
-        type="text"
-        value={hashID}
-        onChange={(e) => setHashID(e.target.value)}
-        placeholder="Enter HashID"
-        style={{ marginBottom: "10px", display: "block" }}
-      />
-      <button onClick={handleSignRequest} disabled={!hashID}>
-        ✍️ Sign Request
-      </button>
+      {/* {accountInfo.doctor && (
+        <div className="bg-gray-100 p-4 rounded">
+          <p>
+            <strong>🧑‍⚕️ Doctor:</strong> {accountInfo.doctor}
+          </p>
+          <p>
+            <strong>🏥 Hospital:</strong> {accountInfo.hospital}
+          </p>
+          <p>
+            <strong>👤 Patient:</strong> {accountInfo.patient}
+          </p>
+        </div>
+      )} */}
 
-      <hr />
+      <div className="space-y-2">
+        <input
+          type="text"
+          value={hashID}
+          onChange={(e) => setHashID(e.target.value)}
+          placeholder="Enter HashID"
+          className="w-full p-2 border border-gray-300 rounded"
+        />
+        <button
+          onClick={handleSignRequest}
+          disabled={!hashID}
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition disabled:opacity-50"
+        >
+          ✍️ Sign Request
+        </button>
+      </div>
 
-      <h4>Change Doctor</h4>
-      <input
-        type="text"
-        value={newDoctor}
-        onChange={(e) => {
-          setNewDoctor(e.target.value);
-          localStorage.setItem('newDoctorAddress', e.target.value);
-        }}
-        placeholder="Enter new doctor address"
-        style={{ marginBottom: "10px", display: "block" }}
-      />
-      <button onClick={handleRequestDoctorChange} disabled={!newDoctor}>
-        🔁 Request Doctor Change
-      </button>
-      <button onClick={handleApplyDoctorChange} disabled={!changeDoctorHashID || !newDoctor || sigCount < required} style={{ marginLeft: "10px" }}>
-        ✅ Apply Doctor Change
-      </button>
-      <button onClick={handleClearDoctorChange} style={{ marginLeft: "10px" }}>
-        🧹 Clear
-      </button>
+      <hr className="my-4" />
 
-      {changeDoctorHashID && (
-        <div style={{ marginTop: "10px" }}>
-          <strong>ChangeDoctor HashID:</strong> <span style={{ wordBreak: "break-all" }}>{changeDoctorHashID}</span>
-          <button onClick={handleCopyChangeDoctorHashID} style={{ marginLeft: "10px" }}>
-            {copied ? "✅ Copied" : "📋 Copy"}
+      <div className="space-y-2">
+        <h4 className="text-xl font-semibold ">Change Doctor</h4>
+        <input
+          type="text"
+          value={newDoctor}
+          onChange={(e) => {
+            setNewDoctor(e.target.value);
+            localStorage.setItem("newDoctorAddress", e.target.value);
+          }}
+          placeholder="Enter new doctor address"
+          className="w-full p-2 border border-gray-300 rounded"
+        />
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={handleRequestDoctorChange}
+            disabled={!newDoctor}
+            className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition disabled:opacity-50"
+          >
+            🔁 Request Doctor Change
+          </button>
+          <button
+            onClick={handleApplyDoctorChange}
+            disabled={!changeDoctorHashID || !newDoctor || sigCount < required}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition disabled:opacity-50"
+          >
+            ✅ Apply Doctor Change
+          </button>
+          <button
+            onClick={handleClearDoctorChange}
+            className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
+          >
+            🧹 Clear
           </button>
         </div>
-      )}
 
-      {changeDoctorHashID && (
-        <p>
-          ✍️ Signature Progress: <strong>{sigCount}</strong> / {required}
-        </p>
-      )}
+        {changeDoctorHashID && (
+          <>
+            <div className="mt-2">
+              <strong>ChangeDoctor HashID:</strong>{" "}
+              <span className="break-all">{changeDoctorHashID}</span>
+              <button
+                onClick={handleCopyChangeDoctorHashID}
+                className="ml-2 text-blue-600 hover:underline"
+              >
+                {copied ? "✅ Copied" : "📋 Copy"}
+              </button>
+            </div>
+            <p>
+              ✍️ Signature Progress: <strong>{sigCount}</strong> / {required}
+            </p>
+          </>
+        )}
+      </div>
 
-      <hr />
+      <hr className="my-4" />
 
-      <h4>Change Hospital</h4>
-      <input
-        type="text"
-        value={newHospital}
-        onChange={(e) => {
-          setNewHospital(e.target.value);
-          localStorage.setItem('newHospitalAddress', e.target.value);
-        }}
-        placeholder="Enter new hospital address"
-        style={{ marginBottom: "10px", display: "block" }}
-      />
-      <button onClick={handleRequestHospitalChange} disabled={!newHospital}>
-        🔁 Request Hospital Change
-      </button>
-      <button onClick={handleApplyHospitalChange} disabled={!changeHospitalHashID || !newHospital || hospitalSigCount < required} style={{ marginLeft: "10px" }}>
-        ✅ Apply Hospital Change
-      </button>
-      <button onClick={handleClearHospitalChange} style={{ marginLeft: "10px" }}>
-        🧹 Clear
-      </button>
-
-      {changeHospitalHashID && (
-        <div style={{ marginTop: "10px" }}>
-          <strong>ChangeHospital HashID:</strong> <span style={{ wordBreak: "break-all" }}>{changeHospitalHashID}</span>
-          <button onClick={handleCopyChangeHospitalHashID} style={{ marginLeft: "10px" }}>
-            {copied ? "✅ Copied" : "📋 Copy"}
+      <div className="space-y-2">
+        <h4 className="text-xl font-semibold ">Change Hospital</h4>
+        <input
+          type="text"
+          value={newHospital}
+          onChange={(e) => {
+            setNewHospital(e.target.value);
+            localStorage.setItem("newHospitalAddress", e.target.value);
+          }}
+          placeholder="Enter new hospital address"
+          className="w-full p-2 border border-gray-300 rounded"
+        />
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={handleRequestHospitalChange}
+            disabled={!newHospital}
+            className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition disabled:opacity-50"
+          >
+            🔁 Request Hospital Change
+          </button>
+          <button
+            onClick={handleApplyHospitalChange}
+            disabled={
+              !changeHospitalHashID ||
+              !newHospital ||
+              hospitalSigCount < required
+            }
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition disabled:opacity-50"
+          >
+            ✅ Apply Hospital Change
+          </button>
+          <button
+            onClick={handleClearHospitalChange}
+            className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
+          >
+            🧹 Clear
           </button>
         </div>
-      )}
 
-      {changeHospitalHashID && (
-        <p>
-          ✍️ Signature Progress: <strong>{hospitalSigCount}</strong> / {required}
-        </p>
-      )}
+        {changeHospitalHashID && (
+          <>
+            <div className="mt-2">
+              <strong>ChangeHospital HashID:</strong>{" "}
+              <span className="break-all">{changeHospitalHashID}</span>
+              <button
+                onClick={handleCopyChangeHospitalHashID}
+                className="ml-2 text-blue-600 hover:underline"
+              >
+                {copied ? "✅ Copied" : "📋 Copy"}
+              </button>
+            </div>
+            <p>
+              ✍️ Signature Progress: <strong>{hospitalSigCount}</strong> /{" "}
+              {required}
+            </p>
+          </>
+        )}
+      </div>
 
-      {status && <p>{status}</p>}
+      {status && <p className="text-sm text-gray-700 mt-4">{status}</p>}
     </div>
   );
 }

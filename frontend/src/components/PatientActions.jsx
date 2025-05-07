@@ -22,16 +22,21 @@ function PatientActions({ contract }) {
   };
 
   return (
-    <div>
-      <h3>Patient Actions</h3>
+    <div className="flex flex-col items-center justify-center gap-2">
+      <h3 className="text-3xl font-bold">Patient Actions</h3>
       <input
         type="text"
         value={hashID}
         onChange={(e) => setHashID(e.target.value)}
         placeholder="Enter HashID"
-        style={{ marginBottom: "10px", display: "block" }}
+        className="w-full max-w-md px-4 py-2 mb-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
       />
-      <button onClick={handleSignRequest} disabled={!hashID}>
+
+      <button
+        className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition duration-300 shadow-md flex items-center gap-2"
+        onClick={handleSignRequest}
+        disabled={!hashID}
+      >
         ✍️ Sign Request
       </button>
       {status && <p>{status}</p>}

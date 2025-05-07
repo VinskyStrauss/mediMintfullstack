@@ -40,15 +40,22 @@ function FolderUploader() {
   };
 
   return (
-    <div>
+    <div className="p-4 border border-gray-300 rounded-lg mt-5 space-y-4">
+      <h3 className="text-lg font-semibold">📤 Upload Folder to IPFS</h3>
       <input
         type="file"
-        webkitdirectory="true"
-        directory=""
-        multiple
         onChange={handleFileChange}
+        className="block w-full text-sm text-white file:mr-4 file:py-2 file:px-4
+               file:rounded-md file:border-0 file:text-sm file:font-semibold
+               file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
       />
-      <button onClick={handleUpload}>Upload Folder to IPFS</button>
+      <button
+        onClick={handleUpload}
+        disabled={files.length === 0}
+        className="bg-blue-500 text-white px-4 py-2 rounded-md disabled:opacity-50"
+      >
+        Upload Folder to IPFS
+      </button>
       <p>{uploadStatus}</p>
     </div>
   );
