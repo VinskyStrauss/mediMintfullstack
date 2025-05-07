@@ -48,7 +48,7 @@ const ViewModal = ({ isOpen, onClose, doctor, patient, hospital }) => {
             <strong>🏥 Hospital:</strong> {accountInfo?.hospital}
           </p>
           <p className="text-m text-black">
-            <strong>👤 Patient:</strong> {accountInfo?.patient}
+            <strong>🧍 Patient:</strong> {accountInfo?.patient}
           </p>
         </div>
       </div>
