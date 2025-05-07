@@ -76,7 +76,6 @@ function PinataUploader() {
   return (
     <div className="p-4 border border-gray-300 rounded-lg mt-5 space-y-4">
       <h3 className="text-lg font-semibold">📤 Upload File to IPFS</h3>
-
       <input
         type="file"
         onChange={handleFileChange}
@@ -84,7 +83,6 @@ function PinataUploader() {
                file:rounded-md file:border-0 file:text-sm file:font-semibold
                file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
       />
-
       <button
         onClick={handleUpload}
         disabled={!file}
@@ -92,9 +90,7 @@ function PinataUploader() {
       >
         Upload to Pinata
       </button>
-
       {uploadStatus && <p className="text-sm text-gray-600">{uploadStatus}</p>}
-
       {link && (
         <p className="text-sm text-blue-600">
           🔗{" "}

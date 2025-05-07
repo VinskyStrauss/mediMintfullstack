@@ -26,30 +26,33 @@ function MetadataUpdater({ contract }) {
   };
 
   return (
-    <div style={{ marginTop: "2rem" }}>
-      <h3>🛠️ Update Metadata</h3>
-
+    <div>
       <input
         type="text"
         placeholder="Token ID"
         value={tokenId}
         onChange={(e) => setTokenId(e.target.value)}
-        style={{ marginBottom: "10px", display: "block" }}
+        className="mt-4 p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
-
       <input
         type="text"
         placeholder="New IPFS CID"
         value={newCID}
         onChange={(e) => setNewCID(e.target.value)}
-        style={{ marginBottom: "10px", display: "block" }}
+        className="mt-4 p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
-
-      <button onClick={handleUpdateMetadata} disabled={loading || !tokenId || !newCID}>
+      <button
+        onClick={handleUpdateMetadata}
+        disabled={loading || !tokenId || !newCID}
+      >
         ♻️ Update Metadata
       </button>
-
-      {status && <p>{loading ? "🔄 " : ""}{status}</p>}
+      {status && (
+        <p>
+          {loading ? "🔄 " : ""}
+          {status}
+        </p>
+      )}
     </div>
   );
 }
