@@ -90,7 +90,7 @@ function App() {
     <div className="relative flex flex-col justify-center items-center gap-5 min-h-screen w-screen">
       {/* Top-right balance component */}
       <div className="absolute top-4 right-4">
-        <GetSepoliaBalance />
+        <GetSepoliaBalance walletAddress={walletAddress} />
       </div>
 
       <div className="flex flex-col gap-5 p-2">

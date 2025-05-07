@@ -1,24 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 
-function GetSepoliaBalance() {
+function GetSepoliaBalance({ walletAddress }) {
   const [balanceInfo, setBalanceInfo] = useState({ address: "", eth: "" });
   const [showBalance, setShowBalance] = useState(true);
+
+  useEffect(() => {
+    if (walletAddress) {
+      getMyEthBalance();
+    }
+  }, [walletAddress]);
 
   const getMyEthBalance = async () => {
     try {
       if (!window.ethereum) throw new Error("MetaMask is not available");
 
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
-      const address = await signer.getAddress();
-
-      const balance = await provider.getBalance(address);
+      const balance = await provider.getBalance(walletAddress);
       const ethBalance = ethers.utils.formatEther(balance);
 
       setBalanceInfo({
-        address,
+        address: walletAddress,
         eth: ethBalance,
       });
       setShowBalance(true); // Automatically show balance when it's fetched
@@ -32,13 +34,6 @@ function GetSepoliaBalance() {
       <h3 className="text-xl font-semibold text-gray-800">
         🔍 Check Sepolia ETH Balance
       </h3>
-
-      <button
-        onClick={getMyEthBalance}
-        className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-xl transition duration-300 focus:outline-none focus:ring-2 focus:ring-green-400"
-      >
-        💰 Get ETH Balance
-      </button>
 
       {balanceInfo.address && (
         <>
