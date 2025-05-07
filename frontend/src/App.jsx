@@ -72,6 +72,20 @@ function App() {
     }
   }
 
+  const getRoleIcon = (role) => {
+    console.log("🔍 Role detected:", role);
+    switch (role) {
+      case "Doctor":
+        return "🧑‍⚕️";
+      case "Hospital":
+        return "🏥";
+      case "Patient":
+        return "🧍";
+      default:
+        return "🔍";
+    }
+  };
+
   return (
     <div className="relative flex flex-col justify-center items-center gap-5 min-h-screen w-screen">
       {/* Top-right balance component */}
@@ -91,7 +105,8 @@ function App() {
           <div className="flex flex-col justify-start items-start text-start text-xl gap-5">
             <p>🟢 Connected Wallet: {walletAddress}</p>
             <p>
-              🧑‍⚕️ Role: <strong>{role || "Detecting..."}</strong>
+              {getRoleIcon(role)} Role:{" "}
+              <strong>{role || "Detecting..."}</strong>
             </p>
           </div>
 

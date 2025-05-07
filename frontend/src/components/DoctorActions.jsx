@@ -188,7 +188,7 @@ function DoctorActions({ contract, walletAddress }) {
             <span className="break-all text-sm">{hashID}</span>
             <button
               onClick={handleCopyHashID}
-              className="bg-gray-100 border px-3 py-1 rounded-md"
+              className=" border px-3 py-1 rounded-md"
             >
               {copied ? "✅ Copied" : "📋 Copy"}
             </button>
