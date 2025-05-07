@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 
 function GetSepoliaBalance() {
   const [balanceInfo, setBalanceInfo] = useState({ address: "", eth: "" });
+  const [showBalance, setShowBalance] = useState(true);
 
   const getMyEthBalance = async () => {
     try {
@@ -20,6 +21,7 @@ function GetSepoliaBalance() {
         address,
         eth: ethBalance,
       });
+      setShowBalance(true); // Automatically show balance when it's fetched
     } catch (error) {
       console.error("Error fetching ETH balance:", error);
     }
@@ -39,16 +41,27 @@ function GetSepoliaBalance() {
       </button>
 
       {balanceInfo.address && (
-        <div className="pt-4 border-t text-left space-y-1 text-gray-700">
-          <p>
-            <span className="font-semibold">Address:</span>{" "}
-            {balanceInfo.address}
-          </p>
-          <p>
-            <span className="font-semibold">ETH:</span> {balanceInfo.eth}{" "}
-            Sepolia ETH
-          </p>
-        </div>
+        <>
+          <button
+            onClick={() => setShowBalance((prev) => !prev)}
+            className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 rounded-xl transition duration-300"
+          >
+            {showBalance ? "🔽 Hide Balance" : "🔼 Show Balance"}
+          </button>
+
+          {showBalance && (
+            <div className="pt-4 border-t text-left space-y-1 text-gray-700">
+              <p>
+                <span className="font-semibold">Address:</span>{" "}
+                {balanceInfo.address}
+              </p>
+              <p>
+                <span className="font-semibold">ETH:</span> {balanceInfo.eth}{" "}
+                Sepolia ETH
+              </p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
