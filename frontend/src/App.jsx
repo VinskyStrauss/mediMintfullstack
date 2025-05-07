@@ -104,7 +104,7 @@ function App() {
         <div className="flex flex-col gap-5 p-2 w-full items-center justify-center">
           <div className="flex flex-col justify-start items-start text-start text-xl gap-5">
             <p>🟢 Connected Wallet: {walletAddress}</p>
-            <p>
+            <p className="text-xl">
               {getRoleIcon(role)} Role:{" "}
               <strong>{role || "Detecting..."}</strong>
             </p>
